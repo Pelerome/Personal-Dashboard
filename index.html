@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Development Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1><i class="fas fa-chart-line"></i> Personal Development Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" onclick="toggleDarkMode()" id="darkModeToggle">
+                        <i class="fas fa-moon"></i> Dark Mode
+                    </button>
+                    <button class="btn btn-primary" onclick="addNewCategory()">
+                        <i class="fas fa-plus"></i> Add Category
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Overview -->
+        <section class="progress-overview">
+            <div class="progress-card">
+                <h3>Overall Progress</h3>
+                <div class="progress-stats">
+                    <div class="stat">
+                        <span class="stat-number" id="totalCategories">0</span>
+                        <span class="stat-label">Categories</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="totalItems">0</span>
+                        <span class="stat-label">Total Items</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="completedItems">0</span>
+                        <span class="stat-label">Completed</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="progressPercentage">0%</span>
+                        <span class="stat-label">Progress</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Categories Grid -->
+        <main class="categories-grid" id="categoriesGrid">
+            <!-- Categories will be dynamically added here -->
+        </main>
+
+        <!-- Add Item Modal -->
+        <div class="modal" id="addItemModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Item</h3>
+                    <button class="close-btn" onclick="closeModal('addItemModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addItemForm">
+                        <div class="form-group">
+                            <label for="itemTitle">Title</label>
+                            <input type="text" id="itemTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemUrl">URL</label>
+                            <input type="url" id="itemUrl" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemType">Type</label>
+                            <select id="itemType" required>
+                                <option value="youtube">YouTube Video</option>
+                                <option value="website">Website/Article</option>
+                                <option value="course">Online Course</option>
+                                <option value="book">Book</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="itemNotes">Notes (Optional)</label>
+                            <textarea id="itemNotes" rows="3"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('addItemModal')">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Item</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Category Modal -->
+        <div class="modal" id="addCategoryModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Category</h3>
+                    <button class="close-btn" onclick="closeModal('addCategoryModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCategoryForm">
+                        <div class="form-group">
+                            <label for="categoryName">Category Name</label>
+                            <input type="text" id="categoryName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryIcon">Icon</label>
+                            <select id="categoryIcon" required>
+                                <option value="fas fa-chart-line">📈 Finance</option>
+                                <option value="fas fa-home">🏠 Real Estate</option>
+                                <option value="fas fa-dumbbell">💪 Fitness</option>
+                                <option value="fas fa-tasks">📋 Product Management</option>
+                                <option value="fas fa-code">💻 Coding</option>
+                                <option value="fas fa-brain">🤖 AI/ML</option>
+                                <option value="fas fa-palette">🎨 UX/UI Design</option>
+                                <option value="fas fa-graduation-cap">🎓 Learning</option>
+                                <option value="fas fa-lightbulb">💡 Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryColor">Color Theme</label>
+                            <select id="categoryColor" required>
+                                <option value="blue">Blue</option>
+                                <option value="green">Green</option>
+                                <option value="purple">Purple</option>
+                                <option value="orange">Orange</option>
+                                <option value="red">Red</option>
+                                <option value="teal">Teal</option>
+                                <option value="pink">Pink</option>
+                                <option value="indigo">Indigo</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal('addCategoryModal')">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Add Category</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
