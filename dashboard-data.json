@@ -57,7 +57,17 @@
       "name": "UX/UI Design",
       "icon": "fas fa-palette",
       "color": "pink",
-      "items": []
+      "items": [
+        {
+          "id": "mdfzyd7tcxslnzvr1o5",
+          "title": "YouTube Video (HmKwiEmJIdM)",
+          "url": "https://www.youtube.com/watch?v=HmKwiEmJIdM&ab_channel=RachelHow",
+          "type": "youtube",
+          "notes": "",
+          "completed": false,
+          "addedAt": "2025-07-23T13:26:03.113Z"
+        }
+      ]
     },
     {
       "id": "mdeb4uuma1pyi54zpj",
@@ -67,5 +77,5 @@
       "items": []
     }
   ],
-  "lastUpdated": "2025-07-23T13:25:34.994Z"
+  "lastUpdated": "2025-07-23T13:26:03.113Z"
 }
