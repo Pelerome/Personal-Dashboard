@@ -1,0 +1,61 @@
+{
+  "categories": [
+    {
+      "id": "mdeb4uum128hqcogrt98",
+      "name": "Personal Finance & Investments",
+      "icon": "fas fa-chart-line",
+      "color": "green",
+      "items": []
+    },
+    {
+      "id": "mdeb4uumiui3amu60wc",
+      "name": "Real Estate",
+      "icon": "fas fa-home",
+      "color": "blue",
+      "items": []
+    },
+    {
+      "id": "mdeb4uumledtiflma6",
+      "name": "Fitness & Health",
+      "icon": "fas fa-dumbbell",
+      "color": "orange",
+      "items": []
+    },
+    {
+      "id": "mdeb4uumx6vjkni2nl9",
+      "name": "Product Management",
+      "icon": "fas fa-tasks",
+      "color": "purple",
+      "items": []
+    },
+    {
+      "id": "mdeb4uuml4cw7p35pk",
+      "name": "Coding & Development",
+      "icon": "fas fa-code",
+      "color": "indigo",
+      "items": []
+    },
+    {
+      "id": "mdeb4uumo8doclk3nr",
+      "name": "AI & Machine Learning",
+      "icon": "fas fa-brain",
+      "color": "teal",
+      "items": []
+    },
+    {
+      "id": "mdeb4uum8wrn2v1rcf",
+      "name": "UX/UI Design",
+      "icon": "fas fa-palette",
+      "color": "pink",
+      "items": []
+    },
+    {
+      "id": "mdeb4uuma1pyi54zpj",
+      "name": "AI Tools & Cursor",
+      "icon": "fas fa-robot",
+      "color": "red",
+      "items": []
+    }
+  ],
+  "lastUpdated": "2025-07-23T13:09:03.175Z"
+}
