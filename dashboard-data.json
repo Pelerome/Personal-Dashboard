@@ -12,7 +12,17 @@
       "name": "Real Estate",
       "icon": "fas fa-home",
       "color": "blue",
-      "items": []
+      "items": [
+        {
+          "id": "mdfzw40grhqnn24fkfn",
+          "title": "Professional.dce.harvard.edu Resource",
+          "url": "https://professional.dce.harvard.edu/blog/real-estate-investing-for-beginners-5-skills-of-successful-investors/",
+          "type": "website",
+          "notes": "",
+          "completed": false,
+          "addedAt": "2025-07-23T13:24:17.872Z"
+        }
+      ]
     },
     {
       "id": "mdeb4uumledtiflma6",
@@ -57,5 +67,5 @@
       "items": []
     }
   ],
-  "lastUpdated": "2025-07-23T13:24:14.979Z"
+  "lastUpdated": "2025-07-23T13:24:17.872Z"
 }
