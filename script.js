@@ -4,10 +4,21 @@ let dashboardData = {
     lastUpdated: new Date().toISOString()
 };
 
+// GitHub Configuration
+const GITHUB_CONFIG = {
+    // You'll need to update these with your actual GitHub details
+    username: 'YOUR_GITHUB_USERNAME', // Replace with your GitHub username
+    repository: 'YOUR_REPO_NAME', // Replace with your repository name
+    branch: 'main', // or 'master' depending on your default branch
+    dataFile: 'dashboard-data.json',
+    token: null // Will be set by user
+};
+
 // Initialize dashboard
-function init() {
-    loadData();
-    initializeDefaultCategories();
+async function init() {
+    checkGitHubAuth();
+    await loadData();
+    await initializeDefaultCategories();
     renderDashboard();
     setupEventListeners();
     setupKeyboardShortcuts();
@@ -49,27 +60,259 @@ function updateDarkModeButton(isDark) {
     }
 }
 
-// Load data from localStorage
-function loadData() {
-    const saved = localStorage.getItem('personalDevelopmentDashboard');
-    if (saved) {
+// Check if GitHub authentication is set up
+function checkGitHubAuth() {
+    const savedUsername = localStorage.getItem('github-username');
+    const savedRepo = localStorage.getItem('github-repo');
+    const savedToken = localStorage.getItem('github-token');
+    
+    if (savedUsername && savedRepo && savedToken) {
+        GITHUB_CONFIG.username = savedUsername;
+        GITHUB_CONFIG.repository = savedRepo;
+        GITHUB_CONFIG.token = savedToken;
+    } else {
+        showGitHubSetupModal();
+    }
+}
+
+// Show GitHub setup modal
+function showGitHubSetupModal() {
+    // Load existing configuration
+    const savedUsername = localStorage.getItem('github-username') || GITHUB_CONFIG.username;
+    const savedRepo = localStorage.getItem('github-repo') || GITHUB_CONFIG.repository;
+    const savedToken = localStorage.getItem('github-token') || '';
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal show';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>GitHub Settings</h3>
+                <button class="close-btn" onclick="this.closest('.modal').remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Configure GitHub integration to sync your dashboard data across computers.</p>
+                <div class="form-group">
+                    <label for="githubUsername">GitHub Username</label>
+                    <input type="text" id="githubUsername" placeholder="your-username" value="${savedUsername}">
+                </div>
+                <div class="form-group">
+                    <label for="githubRepo">Repository Name</label>
+                    <input type="text" id="githubRepo" placeholder="your-repo-name" value="${savedRepo}">
+                </div>
+                <div class="form-group">
+                    <label for="githubToken">GitHub Personal Access Token</label>
+                    <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" value="${savedToken}">
+                    <small>
+                        <a href="https://github.com/settings/tokens" target="_blank">Create a token here</a> 
+                        (needs repo permissions)
+                    </small>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveGitHubConfig()">Save Configuration</button>
+                </div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Save GitHub configuration
+function saveGitHubConfig() {
+    const username = document.getElementById('githubUsername').value;
+    const repo = document.getElementById('githubRepo').value;
+    const token = document.getElementById('githubToken').value;
+    
+    if (!username || !repo || !token) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    GITHUB_CONFIG.username = username;
+    GITHUB_CONFIG.repository = repo;
+    GITHUB_CONFIG.token = token;
+    
+    localStorage.setItem('github-username', username);
+    localStorage.setItem('github-repo', repo);
+    localStorage.setItem('github-token', token);
+    
+    // Remove modal
+    document.querySelector('.modal').remove();
+    
+    // Test connection and create initial data file
+    testGitHubConnection();
+}
+
+// Test GitHub connection
+async function testGitHubConnection() {
+    try {
+        showNotification('Testing GitHub connection...', 'info');
+        
+        // Try to read the data file
+        const data = await loadDataFromGitHub();
+        
+        if (data) {
+            showNotification('GitHub connection successful!', 'success');
+            dashboardData = data;
+            renderDashboard();
+        } else {
+            // Create initial data file
+            await saveDataToGitHub(dashboardData);
+            showNotification('Initial data file created on GitHub!', 'success');
+        }
+    } catch (error) {
+        console.error('GitHub connection failed:', error);
+        showNotification('GitHub connection failed. Check your configuration.', 'error');
+    }
+}
+
+// Load data from GitHub
+async function loadDataFromGitHub() {
+    if (!GITHUB_CONFIG.token) {
+        return null;
+    }
+    
+    try {
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repository}/contents/${GITHUB_CONFIG.dataFile}`;
+        
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Accept': 'application/vnd.github.v3+json'
+            }
+        });
+        
+        if (response.ok) {
+            const fileData = await response.json();
+            const content = atob(fileData.content);
+            return JSON.parse(content);
+        } else if (response.status === 404) {
+            // File doesn't exist yet
+            return null;
+        } else {
+            throw new Error(`GitHub API error: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Error loading from GitHub:', error);
+        return null;
+    }
+}
+
+// Save data to GitHub
+async function saveDataToGitHub(data) {
+    if (!GITHUB_CONFIG.token) {
+        return false;
+    }
+    
+    try {
+        // First, try to get the current file to get its SHA
+        const getUrl = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repository}/contents/${GITHUB_CONFIG.dataFile}`;
+        
+        let sha = null;
         try {
-        dashboardData = JSON.parse(saved);
-        } catch (e) {
-        console.error('Error loading data:', e);
-        dashboardData = { categories: [], lastUpdated: new Date().toISOString() };
+            const getResponse = await fetch(getUrl, {
+                headers: {
+                    'Authorization': `token ${GITHUB_CONFIG.token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            
+            if (getResponse.ok) {
+                const fileData = await getResponse.json();
+                sha = fileData.sha;
+            }
+        } catch (error) {
+            // File doesn't exist, that's okay
+        }
+        
+        // Prepare the update request
+        const updateUrl = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repository}/contents/${GITHUB_CONFIG.dataFile}`;
+        
+        const content = btoa(JSON.stringify(data, null, 2));
+        
+        const updateData = {
+            message: `Update dashboard data - ${new Date().toISOString()}`,
+            content: content,
+            branch: GITHUB_CONFIG.branch
+        };
+        
+        if (sha) {
+            updateData.sha = sha;
+        }
+        
+        const response = await fetch(updateUrl, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updateData)
+        });
+        
+        if (response.ok) {
+            console.log('Data saved to GitHub successfully');
+            return true;
+        } else {
+            const errorData = await response.json();
+            throw new Error(`GitHub API error: ${response.status} - ${errorData.message}`);
+        }
+    } catch (error) {
+        console.error('Error saving to GitHub:', error);
+        return false;
+    }
+}
+
+// Load data (now tries GitHub first, falls back to localStorage)
+async function loadData() {
+    // Try to load from GitHub first
+    const githubData = await loadDataFromGitHub();
+    
+    if (githubData) {
+        dashboardData = githubData;
+        console.log('Data loaded from GitHub');
+    } else {
+        // Fall back to localStorage
+        const saved = localStorage.getItem('personalDevelopmentDashboard');
+        if (saved) {
+            try {
+                dashboardData = JSON.parse(saved);
+                console.log('Data loaded from localStorage');
+            } catch (e) {
+                console.error('Error loading data:', e);
+                dashboardData = { categories: [], lastUpdated: new Date().toISOString() };
+            }
         }
     }
 }
 
-// Save data to localStorage
-function saveData() {
+// Save data (now saves to both GitHub and localStorage)
+async function saveData() {
+    dashboardData.lastUpdated = new Date().toISOString();
+    
+    // Save to localStorage as backup
+    localStorage.setItem('personalDevelopmentDashboard', JSON.stringify(dashboardData));
+    
+    // Try to save to GitHub
+    if (GITHUB_CONFIG.token) {
+        const success = await saveDataToGitHub(dashboardData);
+        if (!success) {
+            console.warn('Failed to save to GitHub, data saved locally only');
+        }
+    }
+}
+
+// Synchronous version for backward compatibility
+function saveDataSync() {
     dashboardData.lastUpdated = new Date().toISOString();
     localStorage.setItem('personalDevelopmentDashboard', JSON.stringify(dashboardData));
 }
 
 // Initialize default categories
-function initializeDefaultCategories() {
+async function initializeDefaultCategories() {
     if (dashboardData.categories.length === 0) {
         const defaultCategories = [
             {
@@ -131,7 +374,7 @@ function initializeDefaultCategories() {
         ];
         
         dashboardData.categories = defaultCategories;
-        saveData();
+        await saveData();
     }
 }
 
@@ -250,15 +493,15 @@ function updateProgressStats() {
 // Setup event listeners
 function setupEventListeners() {
     // Add category form
-    document.getElementById('addCategoryForm').addEventListener('submit', function(e) {
+    document.getElementById('addCategoryForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        addNewCategoryFromForm();
+        await addNewCategoryFromForm();
     });
     
     // Add item form
-    document.getElementById('addItemForm').addEventListener('submit', function(e) {
+    document.getElementById('addItemForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        addNewItemFromForm();
+        await addNewItemFromForm();
     });
     
     // Close modals when clicking outside
@@ -283,7 +526,7 @@ function addNewCategory() {
     showModal('addCategoryModal');
 }
 
-function addNewCategoryFromForm() {
+async function addNewCategoryFromForm() {
     const name = document.getElementById('categoryName').value;
     const icon = document.getElementById('categoryIcon').value;
     const color = document.getElementById('categoryColor').value;
@@ -297,7 +540,7 @@ function addNewCategoryFromForm() {
     };
     
     dashboardData.categories.push(newCategory);
-    saveData();
+    await saveData();
     renderDashboard();
     closeModal('addCategoryModal');
     
@@ -311,7 +554,7 @@ function addItemToCategory(categoryId) {
     showModal('addItemModal');
 }
 
-function addNewItemFromForm() {
+async function addNewItemFromForm() {
     const title = document.getElementById('itemTitle').value;
     const url = document.getElementById('itemUrl').value;
     const type = document.getElementById('itemType').value;
@@ -330,7 +573,7 @@ function addNewItemFromForm() {
     const category = dashboardData.categories.find(cat => cat.id === currentCategoryId);
     if (category) {
         category.items.push(newItem);
-        saveData();
+        await saveData();
         renderDashboard();
         closeModal('addItemModal');
         
@@ -535,7 +778,7 @@ async function quickAddItem(event, categoryId) {
         const category = dashboardData.categories.find(cat => cat.id === categoryId);
         if (category) {
             category.items.push(newItem);
-            saveData();
+            await saveData();
             renderDashboard();
             
             // Clear input
@@ -588,7 +831,7 @@ function showNotification(message, type = 'info') {
 }
 
 // Toggle item completion
-function toggleItem(categoryId, itemId) {
+async function toggleItem(categoryId, itemId) {
     const category = dashboardData.categories.find(cat => cat.id === categoryId);
     if (category) {
         const item = category.items.find(item => item.id === itemId);
@@ -599,43 +842,43 @@ function toggleItem(categoryId, itemId) {
             } else {
                 delete item.completedAt;
             }
-            saveData();
+            await saveData();
             renderDashboard();
         }
     }
 }
 
 // Delete item
-function deleteItem(categoryId, itemId) {
+async function deleteItem(categoryId, itemId) {
     if (confirm('Are you sure you want to delete this item?')) {
         const category = dashboardData.categories.find(cat => cat.id === categoryId);
         if (category) {
             category.items = category.items.filter(item => item.id !== itemId);
-            saveData();
+            await saveData();
             renderDashboard();
         }
     }
 }
 
 // Edit category
-function editCategory(categoryId) {
+async function editCategory(categoryId) {
     const category = dashboardData.categories.find(cat => cat.id === categoryId);
     if (category) {
         // For now, just show a simple prompt. You could enhance this with a modal
         const newName = prompt('Enter new category name:', category.name);
         if (newName && newName.trim()) {
             category.name = newName.trim();
-            saveData();
+            await saveData();
             renderDashboard();
         }
     }
 }
 
 // Delete category
-function deleteCategory(categoryId) {
+async function deleteCategory(categoryId) {
     if (confirm('Are you sure you want to delete this category and all its items?')) {
         dashboardData.categories = dashboardData.categories.filter(cat => cat.id !== categoryId);
-        saveData();
+        await saveData();
         renderDashboard();
     }
 }
@@ -656,19 +899,19 @@ function exportData() {
 }
 
 // Import data (you can add this functionality later)
-function importData() {
+async function importData() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
-    input.onchange = function(e) {
+    input.onchange = async function(e) {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = async function(e) {
                 try {
                     const importedData = JSON.parse(e.target.result);
                     dashboardData = importedData;
-                    saveData();
+                    await saveData();
                     renderDashboard();
                     alert('Data imported successfully!');
                 } catch (error) {
@@ -699,15 +942,15 @@ function setupKeyboardShortcuts() {
 }
 
 // Auto-save every 30 seconds
-setInterval(() => {
-    saveData();
+setInterval(async () => {
+    await saveData();
 }, 30000);
 
 // Initialize the dashboard
 document.addEventListener('DOMContentLoaded', init);
 
 // Add some sample data for demonstration
-function addSampleData() {
+async function addSampleData() {
     const sampleItems = [
         {
             title: 'Personal Finance Basics',
@@ -740,7 +983,7 @@ function addSampleData() {
             };
             dashboardData.categories[categoryIndex].items.push(newItem);
         });
-        saveData();
+        await saveData();
         renderDashboard();
     }
 }
