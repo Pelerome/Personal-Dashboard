@@ -14,6 +14,15 @@
           "notes": "",
           "completed": false,
           "addedAt": "2025-07-27T06:10:58.223Z"
+        },
+        {
+          "id": "mdla6kni308yws4v5v7",
+          "title": "YouTube Video (AivCtZP-aNo)",
+          "url": "https://www.youtube.com/watch?v=AivCtZP-aNo&ab_channel=TheMoneyGuyShow",
+          "type": "youtube",
+          "notes": "",
+          "completed": false,
+          "addedAt": "2025-07-27T06:11:13.038Z"
         }
       ]
     },
@@ -87,5 +96,5 @@
       "items": []
     }
   ],
-  "lastUpdated": "2025-07-27T06:11:08.347Z"
+  "lastUpdated": "2025-07-27T06:11:13.038Z"
 }
