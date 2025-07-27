@@ -41,6 +41,15 @@
           "notes": "",
           "completed": false,
           "addedAt": "2025-07-27T06:11:34.789Z"
+        },
+        {
+          "id": "mdla77eg8og7sh2z5ph",
+          "title": "YouTube Video (JO9sazdQUS4)",
+          "url": "https://www.youtube.com/watch?v=JO9sazdQUS4&ab_channel=LunchMoney",
+          "type": "youtube",
+          "notes": "",
+          "completed": false,
+          "addedAt": "2025-07-27T06:11:42.520Z"
         }
       ]
     },
@@ -114,5 +123,5 @@
       "items": []
     }
   ],
-  "lastUpdated": "2025-07-27T06:11:38.347Z"
+  "lastUpdated": "2025-07-27T06:11:42.520Z"
 }
