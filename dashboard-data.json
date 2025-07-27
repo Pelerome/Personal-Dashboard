@@ -32,6 +32,15 @@
           "notes": "",
           "completed": false,
           "addedAt": "2025-07-27T06:11:25.321Z"
+        },
+        {
+          "id": "mdla71fpwfj9b6d696",
+          "title": "YouTube Video (3t0JYrO964Q)",
+          "url": "https://www.youtube.com/watch?v=3t0JYrO964Q&ab_channel=rachelanita%21",
+          "type": "youtube",
+          "notes": "",
+          "completed": false,
+          "addedAt": "2025-07-27T06:11:34.789Z"
         }
       ]
     },
@@ -105,5 +114,5 @@
       "items": []
     }
   ],
-  "lastUpdated": "2025-07-27T06:11:25.321Z"
+  "lastUpdated": "2025-07-27T06:11:34.789Z"
 }
