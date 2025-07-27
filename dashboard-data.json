@@ -5,7 +5,17 @@
       "name": "Personal Finance & Investments",
       "icon": "fas fa-chart-line",
       "color": "green",
-      "items": []
+      "items": [
+        {
+          "id": "mdla697zg563xe60mno",
+          "title": "YouTube Video (3s7EeUdyX1s)",
+          "url": "https://www.youtube.com/watch?v=3s7EeUdyX1s&ab_channel=IWillTeachYouToBeRich",
+          "type": "youtube",
+          "notes": "",
+          "completed": false,
+          "addedAt": "2025-07-27T06:10:58.223Z"
+        }
+      ]
     },
     {
       "id": "mdeb4uumiui3amu60wc",
@@ -77,5 +87,5 @@
       "items": []
     }
   ],
-  "lastUpdated": "2025-07-24T06:03:25.390Z"
+  "lastUpdated": "2025-07-27T06:10:58.223Z"
 }
