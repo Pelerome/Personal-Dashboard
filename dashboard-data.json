@@ -12,9 +12,8 @@
           "url": "https://www.youtube.com/watch?v=3s7EeUdyX1s&ab_channel=IWillTeachYouToBeRich",
           "type": "youtube",
           "notes": "",
-          "completed": true,
-          "addedAt": "2025-07-27T06:10:58.223Z",
-          "completedAt": "2025-07-28T17:27:27.440Z"
+          "completed": false,
+          "addedAt": "2025-07-27T06:10:58.223Z"
         },
         {
           "id": "mdla6kni308yws4v5v7",
@@ -133,5 +132,5 @@
       "items": []
     }
   ],
-  "lastUpdated": "2025-07-28T17:27:27.440Z"
+  "lastUpdated": "2025-07-28T17:27:28.591Z"
 }
